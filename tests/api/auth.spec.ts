@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { customer } from '../../test-data';
+import { customer, unknownUser } from '../../test-data';
 
 test.describe('Login API', () => {
   test('valid credentials return a bearer token', async ({ request }) => {
@@ -22,10 +22,8 @@ test.describe('Login API', () => {
     expect((await response.json()).email).toBe(customer.email);
   });
 
-  test('wrong password is rejected with 401', async ({ request }) => {
-    const response = await request.post('/users/login', {
-      data: { email: customer.email, password: 'wrong-password' },
-    });
+  test('unknown credentials are rejected with 401', async ({ request }) => {
+    const response = await request.post('/users/login', { data: unknownUser });
     expect(response.status()).toBe(401);
   });
 

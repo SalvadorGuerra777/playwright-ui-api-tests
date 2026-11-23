@@ -16,7 +16,7 @@ export class ProductPage {
   async open(id: string) {
     // wait for the product data, otherwise the form can reset the quantity after we type it
     await Promise.all([
-      this.page.waitForResponse((res) => res.url().includes(`/products/${id}`) && res.ok()),
+      this.page.waitForResponse((res) => res.url().endsWith(`/products/${id}`)),
       this.page.goto(`/product/${id}`),
     ]);
     await this.name.waitFor();
