@@ -4,13 +4,13 @@ import { expect, test } from '../../fixtures';
 test.describe('Login', () => {
   test('customer can sign in and reach their account', async ({ page, loginPage }) => {
     await loginPage.open();
-    // the app also calls /users/me without a token on page load; wait for the authenticated call
-    const profileResponse = page.waitForResponse(
-      (res) => res.url().includes('/users/me') && !!res.request().headers()['authorization'],
+    // POST only: the browser sends a CORS preflight (OPTIONS) to the same URL first
+    const loginResponse = page.waitForResponse(
+      (res) => res.url().includes('/users/login') && res.request().method() === 'POST',
     );
     await loginPage.login(customer.email, customer.password);
 
-    expect((await profileResponse).status()).toBe(200);
+    expect((await loginResponse).status()).toBe(200);
     await expect(page).toHaveURL(/\/account/);
     await expect(page.getByTestId('page-title')).toHaveText('My account');
   });

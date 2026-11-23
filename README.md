@@ -64,7 +64,7 @@ Failed tests keep a screenshot and a trace (`npx playwright show-trace <trace.zi
 | Login API | Valid login returns a bearer token, the token gives access to `/users/me`, unknown credentials return 401, `/users/me` without a token returns 401 |
 | Catalog UI | Search shows only matching products, sort by price ascending, sort by name descending |
 | Product UI | Name and price match the API, adding two units updates the cart quantity |
-| Login UI | Customer signs in, the profile call succeeds and "My account" loads; unknown credentials show an error and stay on the login page |
+| Login UI | Customer signs in, the login request succeeds and "My account" loads; unknown credentials show an error and stay on the login page |
 
 Last local run with CI settings: `51 passed` with `--repeat-each=3` to check for flaky tests.
 
