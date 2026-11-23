@@ -52,7 +52,7 @@ npm run report       # open the last HTML report
 npx playwright test --project=ui --headed   # watch the browser
 ```
 
-Failed tests keep a screenshot and a trace (`npx playwright show-trace <trace.zip>`). In CI the HTML report is uploaded as the `playwright-report` artifact, and failed tests are retried once.
+Failed tests keep a screenshot and a trace (`npx playwright show-trace <trace.zip>`). In CI the HTML report is uploaded as the `playwright-report` artifact, failed tests are retried up to twice, and tests run on a single worker.
 
 ## What is covered
 
@@ -74,4 +74,5 @@ Last local run with CI settings: `51 passed` with `--repeat-each=3` to check for
 - No fixed waits. After a search or sort the page object waits for the API response and for the list to re-render, because the previous results stay on screen until then.
 - The product page waits for the product API call before typing a quantity; without it the form could reset the value and the cart test was flaky.
 - API and UI are separate Playwright projects, so each can run on its own.
+- The app is a shared public demo with very uneven response times (I measured page loads from under 1 second to over 20), so timeouts are higher than they would be for an app under our control, and CI uses one worker so the suite doesn't add load to it.
 - Negative login tests use an email that doesn't exist. The first version used a wrong password on the shared demo account, and after a few runs the API locked it (`423 Account locked, too many failed attempts`), which broke the positive login test in CI.
