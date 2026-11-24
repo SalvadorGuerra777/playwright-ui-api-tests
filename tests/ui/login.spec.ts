@@ -11,7 +11,16 @@ test.describe('Login', () => {
     await loginPage.login(customer.email, customer.password);
 
     expect((await loginResponse).status()).toBe(200);
-    await expect(page).toHaveURL(/\/account/);
+
+    // The account page has a guard: with no valid token it sends the user back to the login form
+    await page.getByTestId('page-title').or(page.getByTestId('login-form')).waitFor();
+    const session = await page.evaluate(() => {
+      const token = localStorage.getItem('auth-token');
+      const claims = token ? JSON.parse(atob(token.split('.')[1])) : null;
+      return { path: location.pathname, exp: claims?.exp, clientTime: Math.floor(Date.now() / 1000) };
+    });
+    expect(session.path, JSON.stringify(session)).toBe('/account');
+    expect(session.exp, 'token should not be expired on the client').toBeGreaterThan(session.clientTime);
     await expect(page.getByTestId('page-title')).toHaveText('My account');
   });
 
