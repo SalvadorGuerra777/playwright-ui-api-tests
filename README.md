@@ -73,6 +73,7 @@ Last local run with CI settings: `51 passed` with `--repeat-each=3` to check for
 - Locators use the app's `data-test` attributes (`testIdAttribute: 'data-test'`), so tests don't depend on styling or copy.
 - No fixed waits. After a search or sort the page object waits for the API response and for the list to re-render, because the previous results stay on screen until then.
 - The product page waits for the product API call before typing a quantity; without it the form could reset the value and the cart test was flaky.
+- Product data in the shared demo changes (other users add products), so tests read it from the API instead of hard-coding it. The name check also covers the "ECO" badge the app shows inside the heading for eco-friendly products.
 - API and UI are separate Playwright projects, so each can run on its own.
 - The app is a shared public demo with very uneven response times (I measured page loads from under 1 second to over 20), so timeouts are higher than they would be for an app under our control, and CI uses one worker so the suite doesn't add load to it.
 - The positive UI login test is skipped in CI only. On GitHub-hosted runners the login request returns 200 and the app redirects to `/account`, but that page never finishes loading; the same test passes locally every time. Login is still covered in CI by the API tests and the negative UI test.

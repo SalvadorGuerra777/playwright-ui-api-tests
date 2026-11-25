@@ -2,12 +2,14 @@ import { Locator, Page } from '@playwright/test';
 
 export class ProductPage {
   readonly name: Locator;
+  readonly ecoBadge: Locator;
   readonly price: Locator;
   readonly quantity: Locator;
   readonly cartQuantity: Locator;
 
   constructor(private readonly page: Page) {
     this.name = page.getByTestId('product-name');
+    this.ecoBadge = this.name.getByTestId('eco-badge');
     this.price = page.getByTestId('unit-price');
     this.quantity = page.getByTestId('quantity');
     this.cartQuantity = page.getByTestId('cart-quantity');

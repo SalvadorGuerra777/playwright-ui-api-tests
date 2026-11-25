@@ -7,7 +7,9 @@ test.describe('Product page', () => {
     const product = data[0];
 
     await productPage.open(product.id);
-    await expect(productPage.name).toHaveText(product.name);
+    // eco-friendly products show an "ECO" badge inside the name heading
+    await expect(productPage.ecoBadge).toHaveCount(product.is_eco_friendly ? 1 : 0);
+    await expect(productPage.name).toHaveText(product.is_eco_friendly ? `${product.name} ECO` : product.name);
     await expect(productPage.price).toHaveText(product.price.toFixed(2));
   });
 
