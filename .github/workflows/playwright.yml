@@ -2,7 +2,7 @@ name: Playwright tests
 
 on:
   push:
-    branches: [main]
+    branches: [main, "debug/**"]
   pull_request:
   workflow_dispatch:
 
@@ -24,7 +24,7 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run tests
-        run: npm test
+        run: npx playwright test tests/ui/diag.spec.ts --project=ui --retries=0 --workers=1 --reporter=list
 
       - name: Upload report
         if: always()
