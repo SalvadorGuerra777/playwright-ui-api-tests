@@ -42,6 +42,8 @@ npx playwright install chromium
 | `CUSTOMER_EMAIL` | `customer2@practicesoftwaretesting.com` | Demo account published in the app's docs |
 | `CUSTOMER_PASSWORD` | `welcome01` | Demo account password |
 
+Locally the tests run against the public demo. CI sets `UI_URL=http://localhost:4200` and `API_URL=http://localhost:8091` and runs the same app in Docker (see [CI](#ci)).
+
 ## Running the tests
 
 ```bash
@@ -53,6 +55,12 @@ npx playwright test --project=ui --headed   # watch the browser
 ```
 
 Failed tests keep a screenshot and a trace (`npx playwright show-trace <trace.zip>`). In CI the HTML report is uploaded as the `playwright-report` artifact, failed tests are retried up to twice, and tests run on a single worker.
+
+## CI
+
+The workflow checks out the app's source ([testsmith-io/practice-software-testing](https://github.com/testsmith-io/practice-software-testing), pinned to one commit), starts it with `docker compose`, seeds a fresh database and runs the whole suite against it. If a test fails, the app's container logs are printed in the job.
+
+Why not the public demo: the demo is behind Cloudflare. A diagnostic run on GitHub-hosted runners showed that after a successful login (`POST /users/login` 200) the `/account` page answers `403` with a bot check ("Just a moment... Performing security verification"), so the page never renders. Blocking third-party scripts made no difference. Getting around a bot check is not something a test suite should do, so CI tests its own copy of the app instead, which also removes the shared demo's slow and changing data from CI results.
 
 ## What is covered
 
@@ -76,5 +84,4 @@ Last local run with CI settings: `51 passed` with `--repeat-each=3` to check for
 - Product data in the shared demo changes (other users add products), so tests read it from the API instead of hard-coding it. The name check also covers the "ECO" badge the app shows inside the heading for eco-friendly products.
 - API and UI are separate Playwright projects, so each can run on its own.
 - The app is a shared public demo with very uneven response times (I measured page loads from under 1 second to over 20), so timeouts are higher than they would be for an app under our control, and CI uses one worker so the suite doesn't add load to it.
-- The positive UI login test is skipped in CI only. On GitHub-hosted runners the login request returns 200 and the app redirects to `/account`, but that page never finishes loading; the same test passes locally every time. Login is still covered in CI by the API tests and the negative UI test.
 - Negative login tests use an email that doesn't exist. The first version used a wrong password on the shared demo account, and after a few runs the API locked it (`423 Account locked, too many failed attempts`), which broke the positive login test in CI.
