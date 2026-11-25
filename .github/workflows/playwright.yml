@@ -34,9 +34,17 @@ jobs:
           docker compose up -d
           timeout 180 bash -c 'until docker compose exec -T laravel-api true; do sleep 3; done'
 
+      # the compose file also has a one-off "composer" service installing into the same folder;
+      # wait for it to exit so the two installs don't run at the same time
       - name: Install API dependencies
         working-directory: app-under-test
-        run: docker compose exec -T -u root laravel-api composer install --no-dev --optimize-autoloader --ignore-platform-req=ext-ffi
+        run: |
+          docker compose wait composer || true
+          docker compose exec -T -u root laravel-api composer install --no-dev --optimize-autoloader --ignore-platform-req=ext-ffi > composer.log 2>&1 || {
+            # job logs need a sign-in; an annotation shows the error on the public run page
+            echo "::error title=composer install::$(tail -25 composer.log | sed ':a;N;$!ba;s/\n/%0A/g')"
+            exit 1
+          }
 
       - name: Create and seed the database
         working-directory: app-under-test
