@@ -3,9 +3,6 @@ import { expect, test } from '../../fixtures';
 
 test.describe('Login', () => {
   test('customer can sign in and reach their account', async ({ page, loginPage }) => {
-    // On GitHub-hosted runners the /account page load never finishes after a successful
-    // login (checked over several CI runs, passes locally). The API login tests still run in CI.
-    test.skip(!!process.env.CI, 'Account page does not finish loading from GitHub runners');
     await loginPage.open();
     // POST only: the browser sends a CORS preflight (OPTIONS) to the same URL first
     const loginResponse = page.waitForResponse(
